@@ -20,6 +20,15 @@ services:
     volumes:
       - $PWD/android/conf:/conf
       - $PWD/certificates/mitmproxy-ca-cert.cer:/ca-cert.cer
+  http_server:
+    build: ./http_server/
+    container_name: http_server
+    networks:
+      - rent_gen_android
+    volumes:
+      - $PWD/http_server/code:/code
+    ports:
+      - 8080:8080
 
 networks:
   rent_gen_android:

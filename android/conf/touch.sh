@@ -1,0 +1,1 @@
+/opt/android-sdk-linux/platform-tools/adb shell input tap $1 $2

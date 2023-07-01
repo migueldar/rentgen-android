@@ -35,3 +35,9 @@ adb wait-for-device
 adb push /$1 /system/etc/security/cacerts
 adb shell chmod 664 /system/etc/security/cacerts/$1
 adb reboot
+
+#wait for complete boot
+adb wait-for-device
+while [ "$(adb shell getprop sys.boot_completed | tr -d '\r')" != "1" ]; do
+    sleep 1
+done

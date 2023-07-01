@@ -1,3 +1,2 @@
-adb shell screencap /sdcard/$N_IMG.png
-adb pull /sdcard/$N_IMG.png
-export N_IMG=$((N_IMG + 1))
+/opt/android-sdk-linux/platform-tools/adb shell screencap /sdcard/screenshot.png
+/opt/android-sdk-linux/platform-tools/adb pull /sdcard/screenshot.png /screenshot.png
