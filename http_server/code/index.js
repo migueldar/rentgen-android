@@ -1,34 +1,36 @@
 const express = require("express");
-const child_process = require("child_process");
+const net = require("net");
+const fs = require("fs");
 
 const device_size_x = 320;
 const device_size_y = 640;
 
-let app = express();
+const app = express();
+const socket_client = net.createConnection({ port: 3000, host: "android" });
 
-app.get("/", function (req, res) {
-	const screenshot_cmd_res = child_process.spawnSync("sshpass", [
-		"-p",
-		"toor",
-		"ssh",
-		"android",
-		"bash",
-		"/conf/screenshot.sh",
-	]);
-	if (screenshot_cmd_res.status === 0) {
-		const scp_cmd_res = child_process.spawnSync("sshpass", [
-			"-p",
-			"toor",
-			"scp",
-			"android:/screenshot.png",
-			"/images/screenshot.png",
-		]);
-		if (scp_cmd_res.status === 0) {
-			res.sendFile("/images/screenshot.png");
-			return;
-		}
+async function sleep(time) {
+	return new Promise((resolve) => setTimeout(resolve, time));
+}
+
+let doneWrite = 0;
+let fd;
+socket_client.on("data", (dataBuf) => {
+	if (dataBuf.toString() === "start")
+		fd = fs.openSync("/code/screenshot.png", "w");
+	else {
+		if (dataBuf.toString().includes("ENDOFMSG")) {
+			fs.writeSync(fd, dataBuf);
+			fs.close(fd);
+			doneWrite = 1;
+		} else fs.writeSync(fd, dataBuf);
 	}
-	res.send("Screenshot event didnt happen\n");
+});
+
+app.get("/", async function (req, res) {
+	socket_client.write("screenshot");
+	while (!doneWrite) await sleep(15);
+	res.sendFile("/code/screenshot.png");
+	doneWrite = 0;
 });
 
 app.post("/", function (req, res) {
@@ -40,19 +42,9 @@ app.post("/", function (req, res) {
 			`the query params must be x <= ${device_size_x}, y <= ${device_size_y}\n`
 		);
 	} else {
-		const cmd_res = child_process.spawnSync("sshpass", [
-			"-p",
-			"toor",
-			"ssh",
-			"android",
-			"bash",
-			"/conf/touch.sh",
-			x,
-			y,
-		]);
-		if (cmd_res.status === 0) res.sendStatus(200);
-		else res.send("Touch event didnt happen\n");
+		socket_client.write(`touch ${x} ${y}`);
+		res.sendStatus(200);
 	}
 });
 
-app.listen(8080, () => console.log("Listening in port 8080\n"));
+app.listen(8080, () => console.log("Listening in port 8080"));
