@@ -51,6 +51,7 @@ RENTGEN_ANDROID docker structure
 |                               :8080                  |
 +---------------------------------+--------------------+
                                   |
-                                  | HTTP: - GET /:  screenshot 
-                                  |       - POST /: touch, query params x, y indicate position
+                                  | HTTP: - GET /:        gui
+                                  |       - GET /screen:  screenshot 
+                                  |       - POST /touch:  touch, body params x, y indicate position
                                   |

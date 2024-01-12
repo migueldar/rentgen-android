@@ -4,3 +4,6 @@ TODO
 certificates
 images
 *.png
+bundleTrafficLog.js
+/http_server/code/dist/
+log

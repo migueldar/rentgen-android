@@ -1,7 +1,8 @@
 #!/bin/bash
 
-npm i -C /code
-node /code/waitSocket.mjs
-node /code/index.js
+npm i
+npm run build
+node waitSocket.mjs
+node index.mjs
 
 #tail -f /dev/null

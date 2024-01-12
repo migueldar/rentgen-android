@@ -1,4 +1,9 @@
 {
+  "scripts": {
+    "start": "zx start.mjs up",
+    "stop": "zx start.mjs down"
+  },
+
   "dependencies": {
     "zx": "^7.2.2"
   }

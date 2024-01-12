@@ -11,11 +11,13 @@ wait-for-offline
 adb wait-for-device	
 adb shell avbctl disable-verification
 
+#here may be the issue with the bypass (start) 
 adb wait-for-device
 adb reboot
 
 adb wait-for-device
 adb root
+#(end)
 
 wait-for-offline
 adb wait-for-device

@@ -4,19 +4,35 @@ const fs = require("fs");
 
 const server = net.createServer();
 
+async function spawnPromise(program, args) {
+	return new Promise((resolve, reject) => {
+		const process = child_process.spawn(program, args);
+		process.on("close", (_) => {
+			resolve();
+		});
+	});
+}
+
 //maybe check output of child processe and send errors in some way
 server.on("connection", (socket) => {
 	socket.on("data", async (dataBuf) => {
 		data = dataBuf.toString();
 		if (data === "screenshot") {
 			socket.write("start");
-			child_process.spawnSync("bash", ["/conf/screenshot.sh"]);
+			await spawnPromise("bash", ["/conf/screenshot.sh"]);
 			socket.write(fs.readFileSync("/screenshot.png"));
 			socket.write("ENDOFMSG");
 		} else if (data.includes("touch")) {
 			dataSplit = data.split(" ");
-			child_process.spawnSync("bash", ["/conf/touch.sh", dataSplit[1], dataSplit[2]]);
+			await spawnPromise("bash", [
+				"/conf/touch.sh",
+				dataSplit[1],
+				dataSplit[2],
+			]);
 		}
+	});
+	socket.on("close", (_) => {
+		socket.end();
 	});
 });
 

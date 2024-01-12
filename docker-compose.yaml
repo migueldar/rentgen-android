@@ -6,6 +6,7 @@ services:
       - rent_gen_android
     volumes:
       - $PWD/certificates:/root/.mitmproxy
+      - $PWD/log:/log
   android:
     build: ./android/
     container_name: android
@@ -28,6 +29,7 @@ services:
       - rent_gen_android
     volumes:
       - $PWD/http_server/code:/code
+      - $PWD/log:/log
     ports:
       - 8080:8080
 
