@@ -1,2 +1,1 @@
-/opt/android-sdk-linux/platform-tools/adb shell screencap /sdcard/screenshot.png
-/opt/android-sdk-linux/platform-tools/adb pull /sdcard/screenshot.png /screenshot.png
+curl http://localhost:9987/v2/uiDevice/screenshot -o /screenshot.png

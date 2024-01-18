@@ -6,6 +6,6 @@ WORKDIR /code
 
 RUN mkdir /images
 
-ENV screenshotDelayMs 1000
+ENV screenshotDelayMs 500
 
 CMD sh /code/docker-entrypoint.sh

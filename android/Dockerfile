@@ -5,7 +5,7 @@ ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/andro
 RUN sdkmanager "system-images;android-33;google_apis;x86_64"
 RUN echo no | avdmanager create avd -n virtual_dev -b google_apis/x86_64 -k "system-images;android-33;google_apis;x86_64"
 
-RUN apt-get update && apt-get install -y iproute2 iputils-ping iptables redsocks npm
+RUN apt-get update && apt-get install -y iproute2 iputils-ping iptables redsocks npm git
 
 EXPOSE 3000
 
