@@ -46,7 +46,7 @@ async function generatePreAndroid() {
 	$`docker run --rm -v $PWD/certificates/mitmproxy-ca-cert.cer:/ca-cert.cer -v $PWD/pre_android/preconf:/preconf --device=/dev/kvm --name pre_android_cont pre_android &`;
 
 	console.log(
-		"installing tls certificate and culebra into the android pre-image"
+		"Installing tls certificate and culebra into the android pre-image..."
 	);
 	//the way of knowing when the culebra install is creating a file in the shared volume
 	let finished = false;
