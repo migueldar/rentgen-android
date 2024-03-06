@@ -20,7 +20,6 @@ services:
       - rent_gen_android
     volumes:
       - $PWD/android/conf:/conf
-      - $PWD/certificates/mitmproxy-ca-cert.cer:/ca-cert.cer
       - $PWD/android/code:/code
   http_server:
     build: ./http_server/
