@@ -3,34 +3,58 @@
 	<head>
 		<meta charset="UTF-8" />
 		<title>Rentgen android</title>
+		<style>
+			main{
+				display: flex;
+			}
+
+			.log-section{
+				height: 600px;
+				width: 300px;
+				overflow-y: auto;
+				display: flex;
+				flex-direction: column;
+				margin-left: 20px;
+			}
+
+			.screen{
+				display: inline-block
+			}
+		</style>
 	</head>
 	<body>
-		<div>
-			<img id="screen" src="" style="display: inline-block" />
+		<main>
+			<img id="screen" src="" class="screen"/>
 			<p
 				id="clicks-log"
-				style="
-					height: 600px;
-					width: 300px;
-					overflow-y: auto;
-					display: inline-block;
-					margin-left: 20px;
-				"
+				class="log-section"
 			></p>
 			<p
 				id="traffic-log"
-				style="
-					height: 600px;
-					width: 500px;
-					overflow-y: auto;
-					display: inline-block;
-					margin-left: 20px;
-				"
+				class="log-section"
 			></p>
-		</div>
+		</main>
 		<script>
 			var screen = document.getElementById("screen");
 			var clicksLog = document.getElementById("clicks-log");
+			let lastTouch = new Date().getTime();
+
+			const calculateElapsedTime = (last) => {
+				const currentTouch = new Date().getTime();
+				const elapsedTime = currentTouch - lastTouch;
+				const elapsedSec = Math.round(elapsedTime / 1000);
+				lastTouch = currentTouch;
+				return elapsedSec;
+			};
+
+			const waitToLog = (clickInfoText) => {
+				const clickInfo = document.createElement("span");
+				const waitInfo = document.createElement("span");
+				waitInfo.textContent = `await wait(${calculateElapsedTime(lastTouch)});`
+				clicksLog.appendChild(waitInfo);
+				clickInfo.textContent = clickInfoText;
+				clicksLog.appendChild(clickInfo);
+			}
 
 			async function displayImage() {
 				try {
@@ -51,7 +75,8 @@
 					phoneY <= 640 &&
 					phoneY >= 0
 				) {
-					clicksLog.innerText += `await click(${phoneX}, ${phoneY});\n`;
+					waitToLog(`await click(${phoneX}, ${phoneY});`);
+
 					await fetch("touch", {
 						method: "POST",
 						headers: {
@@ -59,6 +84,7 @@
 						},
 						body: `x=${phoneX}&y=${phoneY}`,
 					});
+
 				}
 			}
 
