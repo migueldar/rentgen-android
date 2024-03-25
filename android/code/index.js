@@ -16,7 +16,7 @@ async function spawnPromise(program, args) {
 //maybe check output of child processe and send errors in some way
 server.on("connection", (socket) => {
 	socket.on("data", async (dataBuf) => {
-		data = dataBuf.toString();
+		data = dataBuf.toString();  
 		if (data === "screenshot") {
 			socket.write("start");
 			await spawnPromise("bash", ["/conf/screenshot.sh"]);
@@ -29,7 +29,16 @@ server.on("connection", (socket) => {
 				dataSplit[1],
 				dataSplit[2],
 			]);
-		}
+		} else if (data === "back") {
+			await spawnPromise("bash", [
+				"/conf/back.sh",
+			]);
+		} else if (data === "home") {
+		await spawnPromise("bash", [
+			"/conf/home.sh",
+		]);
+	}
+	
 	});
 	socket.on("close", (_) => {
 		socket.end();

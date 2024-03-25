@@ -111,4 +111,14 @@ app.get("/", async function (req, res) {
 	res.send(fileData);
 });
 
+app.post("/back", function (req, res) {
+	socket_client.write(`back`);
+	res.sendStatus(200);
+});
+
+app.post("/home", function (req, res) {
+	socket_client.write(`home`);
+	res.sendStatus(200);
+});
+
 app.listen(8080, () => console.log("Listening in port 8080"));

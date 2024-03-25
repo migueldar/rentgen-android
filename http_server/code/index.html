@@ -20,11 +20,36 @@
 			.screen{
 				display: inline-block
 			}
+
+			.screen-buttons{
+				display: flex;
+				justify-content: space-around;
+				margin-top: 5px;
+				gap: 10px;
+			}
+
+			.screen-buttons button{
+				font-size: 1.1rem;
+				padding: 10px 20px;
+				width: 100%;
+				cursor: pointer;
+				background-color: transparent;
+			}
+
+			.screen-buttons button:hover{
+				background-color: aqua;
+			}
 		</style>
 	</head>
 	<body>
 		<main>
-			<img id="screen" src="" class="screen"/>
+			<section class="screen-section">
+				<img id="screen" alt="android screen" src="" class="screen"/>
+				<div class="screen-buttons">
+					<button class="screen-buttons-home">home</button>
+					<button class="screen-buttons-back">back</button>
+				</div>
+			</section>
 			<p
 				id="clicks-log"
 				class="log-section"
@@ -37,6 +62,9 @@
 		<script>
 			var screen = document.getElementById("screen");
 			var clicksLog = document.getElementById("clicks-log");
+			const homeButton = document.querySelector(".screen-buttons-home");
+			const backButton = document.querySelector(".screen-buttons-back");
+
 			let lastTouch = new Date().getTime();
 
 			const calculateElapsedTime = (last) => {
@@ -56,6 +84,24 @@
 				clicksLog.appendChild(clickInfo);
 			}
 
+			const registerClick = ({path, logText}) =>{
+				const clicksLog = document.getElementById("clicks-log");
+				const span = document.createElement("span");
+
+				waitToLog(logText);
+
+				fetch(path, {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/x-www-form-urlencoded",
+					},
+				});
+			}
+
+			homeButton.addEventListener("click", () => registerClick({path: "home", logText: "await homeButton();"}));
+
+			backButton.addEventListener("click", () => registerClick({path: "back", logText: "await backButton();"}));
+
 			async function displayImage() {
 				try {
 					const response = await fetch("screen");
@@ -67,25 +113,18 @@
 			}
 
 			async function handleTouchEvent(event) {
-				var phoneX = event.offsetX;
-				var phoneY = event.offsetY;
-				if (
-					phoneX <= 320 &&
-					phoneX >= 0 &&
-					phoneY <= 640 &&
-					phoneY >= 0
-				) {
-					waitToLog(`await click(${phoneX}, ${phoneY});`);
+				const phoneX = event.offsetX;
+				const phoneY = event.offsetY;
 
-					await fetch("touch", {
-						method: "POST",
-						headers: {
-							"Content-Type": "application/x-www-form-urlencoded",
-						},
-						body: `x=${phoneX}&y=${phoneY}`,
-					});
-
-				}
+				waitToLog(`await click(${phoneX}, ${phoneY});`);
+				
+				await fetch("touch", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/x-www-form-urlencoded",
+					},
+					body: `x=${phoneX}&y=${phoneY}`,
+				});
 			}
 
 			async function sleep(time) {
