@@ -1,0 +1,1 @@
+/opt/android-sdk-linux/platform-tools/adb shell input swipe $1 $2 $3 $4 1000

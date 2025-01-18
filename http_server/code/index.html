@@ -1,151 +1,186 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<title>Rentgen android</title>
-		<style>
-			main{
-				display: flex;
-			}
+  <head>
+    <meta charset="UTF-8" />
+    <title>Rentgen android</title>
+    <style>
+      main {
+        display: flex;
+      }
 
-			.log-section{
-				height: 600px;
-				width: 300px;
-				overflow-y: auto;
-				display: flex;
-				flex-direction: column;
-				margin-left: 20px;
-			}
+      .log-section {
+        height: 600px;
+        width: 480px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        margin-left: 20px;
+      }
 
-			.screen{
-				display: inline-block
-			}
+      .screen {
+        display: inline-block;
+        cursor: pointer;
+      }
 
-			.screen-buttons{
-				display: flex;
-				justify-content: space-around;
-				margin-top: 5px;
-				gap: 10px;
-			}
+      .screen-buttons {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 5px;
+        gap: 10px;
+      }
 
-			.screen-buttons button{
-				font-size: 1.1rem;
-				padding: 10px 20px;
-				width: 100%;
-				cursor: pointer;
-				background-color: transparent;
-			}
+      .screen-buttons button {
+        font-size: 1.1rem;
+        padding: 10px 20px;
+        width: 100%;
+        cursor: pointer;
+        background-color: transparent;
+      }
 
-			.screen-buttons button:hover{
-				background-color: aqua;
-			}
-		</style>
-	</head>
-	<body>
-		<main>
-			<section class="screen-section">
-				<img id="screen" alt="android screen" src="" class="screen"/>
-				<div class="screen-buttons">
-					<button class="screen-buttons-home">home</button>
-					<button class="screen-buttons-back">back</button>
-				</div>
-			</section>
-			<p
-				id="clicks-log"
-				class="log-section"
-			></p>
-			<p
-				id="traffic-log"
-				class="log-section"
-			></p>
-		</main>
-		<script>
-			var screen = document.getElementById("screen");
-			var clicksLog = document.getElementById("clicks-log");
-			const homeButton = document.querySelector(".screen-buttons-home");
-			const backButton = document.querySelector(".screen-buttons-back");
+      .screen-buttons button:hover {
+        background-color: aqua;
+      }
 
-			let lastTouch = new Date().getTime();
+      #clicks-log {
+        font-family: Menlo, Consolas, Monaco, Liberation Mono, Lucida Console,
+          monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="screen-section">
+        <img
+          id="screen"
+          alt="android screen"
+          src=""
+          draggable="false"
+          class="screen"
+        />
+        <div class="screen-buttons">
+          <button class="screen-buttons-home">home</button>
+          <button class="screen-buttons-back">back</button>
+        </div>
+      </section>
+      <p id="clicks-log" class="log-section"></p>
+      <p id="traffic-log" class="log-section"></p>
+    </main>
+    <script>
+      var screen = document.getElementById("screen");
+      var clicksLog = document.getElementById("clicks-log");
+      const homeButton = document.querySelector(".screen-buttons-home");
+      const backButton = document.querySelector(".screen-buttons-back");
 
-			const calculateElapsedTime = (last) => {
-				const currentTouch = new Date().getTime();
-				const elapsedTime = currentTouch - lastTouch;
-				const elapsedSec = Math.round(elapsedTime / 1000);
-				lastTouch = currentTouch;
-				return elapsedSec;
-			};
+      let lastTouch = new Date().getTime();
 
-			const waitToLog = (clickInfoText) => {
-				const clickInfo = document.createElement("span");
-				const waitInfo = document.createElement("span");
-				waitInfo.textContent = `await wait(${calculateElapsedTime(lastTouch)});`
-				clicksLog.appendChild(waitInfo);
-				clickInfo.textContent = clickInfoText;
-				clicksLog.appendChild(clickInfo);
-			}
+      const calculateElapsedTime = (last) => {
+        const currentTouch = new Date().getTime();
+        const elapsedTime = currentTouch - lastTouch;
+        const elapsedSec = Math.round(elapsedTime / 1000);
+        lastTouch = currentTouch;
+        return elapsedSec;
+      };
 
-			const registerClick = ({path, logText}) =>{
-				const clicksLog = document.getElementById("clicks-log");
-				const span = document.createElement("span");
+      const waitToLog = (clickInfoText) => {
+        const clickInfo = document.createElement("span");
+        const waitInfo = document.createElement("span");
+        waitInfo.textContent = `await wait(${calculateElapsedTime(
+          lastTouch
+        )});`;
+        clicksLog.appendChild(waitInfo);
+        clickInfo.textContent = clickInfoText;
+        clicksLog.appendChild(clickInfo);
+      };
 
-				waitToLog(logText);
+      const registerClick = ({ path, logText, body }) => {
+        const clicksLog = document.getElementById("clicks-log");
+        const span = document.createElement("span");
 
-				fetch(path, {
-					method: "POST",
-					headers: {
-						"Content-Type": "application/x-www-form-urlencoded",
-					},
-				});
-			}
+        waitToLog(logText);
 
-			homeButton.addEventListener("click", () => registerClick({path: "home", logText: "await homeButton();"}));
+        fetch(path, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          ...(body ? { body } : {}),
+        });
+      };
 
-			backButton.addEventListener("click", () => registerClick({path: "back", logText: "await backButton();"}));
+      homeButton.addEventListener("click", () =>
+        registerClick({ path: "home", logText: "await homeButton();" })
+      );
 
-			async function displayImage() {
-				try {
-					const response = await fetch("screen");
-					const blob = await response.blob();
-					screen.src = URL.createObjectURL(blob);
-				} catch (error) {
-					console.error("Error fetching image: ", error);
-				}
-			}
+      backButton.addEventListener("click", () =>
+        registerClick({ path: "back", logText: "await backButton();" })
+      );
 
-			async function handleTouchEvent(event) {
-				const phoneX = event.offsetX;
-				const phoneY = event.offsetY;
+      async function displayImage() {
+        try {
+          const response = await fetch("screen");
+          const blob = await response.blob();
+          screen.src = URL.createObjectURL(blob);
+        } catch (error) {
+          console.error("Error fetching image: ", error);
+        }
+      }
 
-				waitToLog(`await click(${phoneX}, ${phoneY});`);
-				
-				await fetch("touch", {
-					method: "POST",
-					headers: {
-						"Content-Type": "application/x-www-form-urlencoded",
-					},
-					body: `x=${phoneX}&y=${phoneY}`,
-				});
-			}
+      let isDragging = false;
+      let startDraggingPosX = 0;
+      let endDraggingPosX = 0;
+      let startDraggingPosY = 0;
+      let endDraggingPosY = 0;
 
-			async function sleep(time) {
-				return new Promise((resolve) => setTimeout(resolve, time));
-			}
+      const handleDraggStart = (e) => {
+        e.preventDefault();
+        isDragging = true;
+        startDraggingPosX = e.offsetX;
+        startDraggingPosY = e.offsetY;
+      };
 
-			async function screenshot_loop() {
-				var before;
+      screen.addEventListener("mousedown", handleDraggStart);
 
-				while (true) {
-					before = performance.now();
-					await displayImage();
-					while (performance.now() - before < ___screenshotDelayMs___)
-						await sleep(50);
-				}
-			}
+      document.addEventListener("mouseup", (e) => {
+        endDraggingPosX = e.offsetX;
+        endDraggingPosY = e.offsetY;
+        if (
+          (isDragging && Math.abs(endDraggingPosY - startDraggingPosY) > 10) ||
+          Math.abs(endDraggingPosX - startDraggingPosX) > 10
+        ) {
+          registerClick({
+            path: "drag",
+            logText: `await drag({x:${startDraggingPosX},y:${startDraggingPosY}},{x:${e.offsetX},y:${e.offsetY}});`,
+            body: `startX=${startDraggingPosX}&startY=${startDraggingPosY}&endX=${e.offsetX}&endY=${e.offsetY}`,
+          });
+          isDragging = false;
+        } else {
+          const phoneX = event.offsetX;
+          const phoneY = event.offsetY;
+          registerClick({
+            path: "touch",
+            logText: `await click(${phoneX}, ${phoneY});`,
+            body: `x=${phoneX}&y=${phoneY}`,
+          });
+        }
+      });
 
-			screen.addEventListener("click", handleTouchEvent);
+      async function sleep(time) {
+        return new Promise((resolve) => setTimeout(resolve, time));
+      }
 
-			screenshot_loop();
-		</script>
-		<script src="/trafficLog.js"></script>
-	</body>
+      async function screenshot_loop() {
+        var before;
+
+        while (true) {
+          before = performance.now();
+          await displayImage();
+          while (performance.now() - before < ___screenshotDelayMs___)
+            await sleep(50);
+        }
+      }
+
+      screenshot_loop();
+    </script>
+    <script src="/trafficLog.js"></script>
+  </body>
 </html>
