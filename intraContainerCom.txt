@@ -1,0 +1,11 @@
+INTRA CONTAINER COMMUNICATION
+
+FROM HTTPSERVER TO ANDROID
+- screenshot
+- home
+- back
+- touch $x $y
+- drag $startx $starty $endx $endy
+
+FROM ANDROID TO HTTPSERVER
+- start $screenshotdata ENDOFMSG (to send screenshot data)

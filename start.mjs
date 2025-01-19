@@ -43,7 +43,7 @@ async function generateCert() {
 
 async function generatePreAndroid() {
 	await $`docker build -t pre_android pre_android`;
-	$`docker run --rm -v $PWD/certificates/mitmproxy-ca-cert.cer:/ca-cert.cer -v $PWD/pre_android/preconf:/preconf --device=/dev/kvm --name pre_android_cont pre_android &`;
+	$`docker run --sysctl net.ipv6.conf.all.disable_ipv6=1 --rm -v $PWD/certificates/mitmproxy-ca-cert.cer:/ca-cert.cer -v $PWD/pre_android/preconf:/preconf --device=/dev/kvm --name pre_android_cont pre_android &`;
 
 	console.log(
 		"Installing tls certificate and culebra into the android pre-image..."
@@ -90,5 +90,5 @@ else if (process.argv[3] === "generateCert") {
 	generatePreAndroid();
 } else
 	throw new Error(
-		"expected [up | down | generateCert | generatePreAndroid ] as argument"
+		"expected [ up | down | generateCert | generatePreAndroid ] as argument"
 	);

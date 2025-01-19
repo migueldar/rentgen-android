@@ -131,6 +131,8 @@
       let startDraggingPosY = 0;
       let endDraggingPosY = 0;
 
+      const screenSize = [320, 640]
+
       const handleDraggStart = (e) => {
         e.preventDefault();
         isDragging = true;
@@ -144,24 +146,25 @@
         endDraggingPosX = e.offsetX;
         endDraggingPosY = e.offsetY;
         if (
-          (isDragging && Math.abs(endDraggingPosY - startDraggingPosY) > 10) ||
-          Math.abs(endDraggingPosX - startDraggingPosX) > 10
+          isDragging && (Math.abs(endDraggingPosY - startDraggingPosY) > 10 ||
+          Math.abs(endDraggingPosX - startDraggingPosX) > 10)
         ) {
           registerClick({
             path: "drag",
             logText: `await drag({x:${startDraggingPosX},y:${startDraggingPosY}},{x:${e.offsetX},y:${e.offsetY}});`,
             body: `startX=${startDraggingPosX}&startY=${startDraggingPosY}&endX=${e.offsetX}&endY=${e.offsetY}`,
           });
-          isDragging = false;
         } else {
           const phoneX = event.offsetX;
           const phoneY = event.offsetY;
-          registerClick({
-            path: "touch",
-            logText: `await click(${phoneX}, ${phoneY});`,
-            body: `x=${phoneX}&y=${phoneY}`,
-          });
+          if (phoneX <= screenSize[0] && phoneY <= screenSize[1])
+            registerClick({
+              path: "touch",
+              logText: `await click(${phoneX}, ${phoneY});`,
+              body: `x=${phoneX}&y=${phoneY}`,
+            });
         }
+        isDragging = false;
       });
 
       async function sleep(time) {
